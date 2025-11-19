@@ -13,7 +13,14 @@ export const projects: Project[] = [
     {
         name: "smarttask",
         displayName: "SmartTask",
-        description: "SmartTask est une app de gestion des tâches assisté par une intelligence artificielle. Le but est de créer un contexte de projet et l'IA doit générer les tâches qui se trouveront dans le board, ainsi qu'une liste d'étapes pouvant aider à sa completion. Il s'agit d'un projet que j'ai choisi de faire dans le cadre de mon projet TPI de 4ème année, je suis fier de ce que j'ai pu accomplir durant ses deux semaines de travail.",
+        description:`
+        SmartTask est une application web de gestion de tâches assistée par intelligence artificielle.  
+        L'utilisateur crée un contexte de projet, et l'IA génère automatiquement un tableau de tâches et une liste d'étapes clés pour faciliter la réalisation du projet.
+        
+        Ce projet a été réalisé dans le cadre de mon Travail Pratique Individuel (TPI) de 4ème année de CFC,  
+        soutenu devant un jury d'experts, et m'a permis d'obtenir mon diplôme avec la note finale de 5.1 / 6.
+        
+        Il représente environ 55 heures de travail en deux semaines, avec une architecture complète frontend/backend et une intégration d'IA.`,
         shortDescription:"Un gestionnaire des tâches assité par une intelligeance artificielle.",
         detailTech: "Next.js, Java Spring Boot, MySQL",
         temps: "55 heures de travail",

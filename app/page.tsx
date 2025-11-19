@@ -1,21 +1,33 @@
 "use client"
-import { Minus, Square, X } from "lucide-react";
+import { Divide, Minus, Square, X } from "lucide-react";
 import { JSX, useEffect, useRef, useState } from "react";
 import { Project, projects } from "./projects/projects";
+import { Commande, commandes } from "./commande/commande";
+import { useTerminalStore } from "./store/store";
+
 
 export default function Home() {
+  const {
+    commandHistory, setCommandHistory,
+    inputValue, setInputValue,
+    historyIndex, setHistoryIndex,
+    isProjectOpen, setIsProjectOpen,
+    selectedProject, setSelectedProject,
+    currentMediaIndex, setCurrentMediaIndex
+  } = useTerminalStore();
   const [terminalHistory, setTerminalHistory] = useState<JSX.Element[]>([
     <div>
-      Bienvenue dans mon portfolio ! Tapez <span className="text-yellow-300 font-semibold">help</span> pour commencer.
+      <span className="text-white">
+        Bienvenue dans mon portfolio ! Tapez 
+      </span>
+      <span className="text-yellow-300 font-semibold"> help </span>
+      <span className="text-white">
+        pour commencer.
+      </span> 
     </div>
   ]);
-  const [commandHistory, setCommandHistory] = useState<string[]>([]);
-  const [inputValue, setInputValue] = useState("");
-  const [historyIndex, setHistoryIndex] = useState(0);
-  const [isProjectOpen, setIsProjectOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<Project>();
+
   const terminalEndRef = useRef<HTMLDivElement>(null);
-  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
 
   const handlePrev = () => {
     if (currentMediaIndex > 0) {
@@ -41,7 +53,7 @@ export default function Home() {
   const handleCommand = (cmd: string) => {
     const command = cmd.trim().toLowerCase();
 
-    setCommandHistory((prev) => [...prev, command]);
+    setCommandHistory((prev: string[]) => [...prev, command]);
 
     setTerminalHistory((prev) => [
       ...prev,
@@ -61,64 +73,22 @@ export default function Home() {
   };
 
   const getCommandResponse = (command: string): JSX.Element[] => {
-    if (command === "help") {
+    const [input, ...args] = command.trim().split(" ");
+    const commande = commandes.find((c) => c.name === input);
+
+    if (commande) {
+      return commande.run(args);
+    } else {
       return [
-        <div key="h1">Commandes disponibles :</div>,
-        <div key="h2">- <span className="text-yellow-300">help</span>: Affiche cette page</div>,
-        <div key="h3">- <span className="text-yellow-300">open &lt;nom&gt;</span>: Ouvre un projet</div>,
-        <div key="h4">- <span className="text-yellow-300">list</span>: Liste les projets</div>,
-        <div key="h5">- <span className="text-yellow-300">clear</span>: Efface l'historique du terminal</div>,
+        <div className="text-red-500" key="unknown">
+          Commande inconnue : {input}
+        </div>,
       ];
     }
-
-    if (command.startsWith("open")) {
-      const args = command.split(" ");
-
-      const project = projects.find(p => p.name === args[1].toLowerCase());
-      if (project) {
-        setSelectedProject(project);
-        setIsProjectOpen(true);
-        return [
-          <div>Projet {project.displayName} ouvert !</div>
-        ]
-      } else {
-        return [<div key="notfound" className="text-red-500">Projet introuvable. Utilise <span className="text-yellow-300">list</span> pour voir les projets disponibles.</div>];
-      }
-    }
-
-    if (command === "list") {
-      let response = [];
-      for (let i = 0; i < projects.length; i++) {
-        response.push(
-          <div className="flex space-x-1">
-            <span className="text-yellow-300">{`${projects[i].displayName} (${projects[i].name})`}</span>
-            <span>-</span>
-            <span>{projects[i].shortDescription}</span>
-          </div>
-        )
-      }
-      return response;
-    }
-
-    if (command === "random") {
-      const project = projects[Math.floor(Math.random() * projects.length)];
-      setSelectedProject(project);
-      setIsProjectOpen(true);
-      return [<div>Projet {project.displayName} ouvert aléatoirement ! 🎲</div>];
-    }    
 
     if (command === "about") {
       return [];
     }
-
-    if (command === "clear") {
-      setTerminalHistory([]);
-      setCommandHistory([]);
-      setHistoryIndex(0);
-      return [];
-    }
-
-    return [<div key="err">Commande inconnue : {command}</div>];
   };
 
   useEffect(() => {
@@ -130,7 +100,7 @@ export default function Home() {
       <div className="rounded-t-lg h-full">
         <div className="h-7 bg-gradient-to-b from-[#56544C] to-[#3E3D38] rounded-t-lg flex justify-between p-1">
           <div></div>
-          <h3 className="font-semibold">
+          <h3 className="font-semibold text-white">
             ludo@kibibyte:/portfolio
           </h3>
           <div className="flex space-x-1">
@@ -199,14 +169,14 @@ export default function Home() {
         </div>
       </div>
       {selectedProject && (
-        <div className="fixed mx-auto inset-1 bg-[#1c1c1c] text-white p-6 rounded-lg w-[1000px] max-w-[90%] overflow-y-auto">
+        <div className="fixed mx-auto inset-1 bg-[#1c1c1c] text-white p-3 rounded-lg max-w-[90%] overflow-y-auto">
           <h2 className="text-xl font-bold mb-2">{selectedProject.displayName}</h2>
           <p className="text-sm italic text-gray-300 mb-4">
             {selectedProject.detailTech} – {selectedProject.temps}
           </p>
           <div className="overflow-y-auto">
 
-            <p className="mb-4">{selectedProject.description}</p>
+            <p className="mb-4" style={{ whiteSpace: 'pre-line' }}>{selectedProject.description}</p>
 
             {/* Carousel d’images */}
             <div className="flex justify-center items-center mb-4">
